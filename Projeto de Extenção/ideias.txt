@@ -1,0 +1,76 @@
+<?php
+// Conecte-se ao banco de dados MySQL (substitua pelas suas credenciais reais)
+$host = "localhost";
+$username = "seu_usuario";
+$password = "sua_senha";
+$database = "sistema_financeiro";
+
+$conn = mysqli_connect($host, $username, $password, $database);
+
+if (!$conn) {
+    die("Falha na conexão: " . mysqli_connect_error());
+}
+
+// Crie a tabela de transações (você pode adicionar mais campos conforme necessário)
+$sql = "CREATE TABLE IF NOT EXISTS transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(255) NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    date DATE NOT NULL
+)";
+
+if (mysqli_query($conn, $sql)) {
+    echo "Tabela 'transactions' criada com sucesso!";
+} else {
+    echo "Erro ao criar tabela: " . mysqli_error($conn);
+}
+
+// Insira uma transação de exemplo (você pode substituir isso pela entrada do usuário)
+$descricaoExemplo = "Despesa de Exemplo";
+$valorExemplo = 100.00;
+$dataExemplo = date("Y-m-d");
+
+$sql = "INSERT INTO transactions (description, amount, date)
+        VALUES ('$descricaoExemplo', $valorExemplo, '$dataExemplo')";
+
+if (mysqli_query($conn, $sql)) {
+    echo "Transação de exemplo inserida com sucesso!";
+} else {
+    echo "Erro ao inserir transação de exemplo: " . mysqli_error($conn);
+}
+
+// Exiba todas as transações (você pode criar uma página separada para isso)
+$sql = "SELECT * FROM transactions";
+$resultado = mysqli_query($conn, $sql);
+
+if (mysqli_num_rows($resultado) > 0) {
+    while ($linha = mysqli_fetch_assoc($resultado)) {
+        echo "ID: " . $linha["id"] . " | Descrição: " . $linha["description"] . " | Valor: $" . $linha["amount"] . " | Data: " . $linha["date"] . "<br>";
+    }
+} else {
+    echo "Nenhuma transação encontrada.";
+}
+
+// Feche a conexão com o banco de dados
+mysqli_close($conn);
+?>
+
+<!-- Formulário HTML para adicionar novas transações -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sistema de Controle Financeiro</title>
+</head>
+<body>
+    <h1>Sistema de Controle Financeiro</h1>
+    <form action="add_transaction.php" method="post">
+        <label for="description">Descrição:</label>
+        <input type="text" name="description" required><br>
+        <label for="amount">Valor:</label>
+        <input type="number" name="amount" step="0.01" required><br>
+        <label for="date">Data:</label>
+        <input type="date" name="date" required><br>
+        <input type="submit" value="Adicionar Transação">
+    </form>
+</body>
+</html>
